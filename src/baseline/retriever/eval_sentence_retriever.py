@@ -1,6 +1,4 @@
 import sys
-sys.path.append("/home/hunan/feverous/mycode/src")
-
 import argparse
 import json
 from tqdm import tqdm
@@ -47,21 +45,11 @@ if __name__ == "__main__":
     parser.add_argument('--max_page', type=int, default=5)
     parser.add_argument('--max_sent', type=int, default=5)
     parser.add_argument('--all', type=int, default=1)
-    parser.add_argument('--input_path', type=str, default='/home/hunan/feverous/mycode/data/{0}.sentences.roberta.p{1}.s{2}.jsonl')
     args = parser.parse_args()
     split = args.split
 
-    # q = 0
-    # q_all = 0
-    # score = 0
-    # score_all = 0
-    
-    #in_path = '/home/hunan/feverous/mycode/data/{0}.sentences.roberta.p{1}.s{2}.jsonl'.format(split, args.max_page, args.max_sent)
-    #in_path = '/home/hunan/feverous/mycode/data/{}.{}.{}.roberta.graph.jsonl'.format(args.split, 'direct_sorting', str(30))
-   # in_path = '/home/hunan/feverous/mycode/data/{}.fusion.results.jsonl'.format(args.split)
-    
-    #in_path =  '/home/hunan/feverous/mycode/data/dev.roberta.not_precomputed.p5.s5.t3.jsonl'
-    in_path = '/home/hunan/feverous/mycode/data/{}.fusion.results.jsonl'.format(args.split)
+
+    in_path = 'data/{}.sentences.roberta.p{}.s{}.jsonl'.format(args.split, args.max_page, args.max_sent)
     #in_path = args.input_path
     # annotation_processor = AnnotationProcessor(args.input_path)
     # if args.all == 0:
@@ -95,8 +83,8 @@ coverage = []
 precision = []
 coverage_all = []
 precision_all = []
-# in_path = 'data/annotations/{0}.sentences.not_precomputed.p{1}.s{2}.jsonl'.format(split, args.max_page, args.max_sent)
-annotation_processor = AnnotationProcessor('/home/hunan/feverous/mycode/data/{}.jsonl'.format(args.split))
+
+annotation_processor = AnnotationProcessor('data/{}.jsonl'.format(args.split))
 if args.all == 0:
     annotation_by_id = {el.get_id(): el for el in annotation_processor if el.has_evidence() and el.get_evidence_type(flat=True) == EvidenceType.SENTENCE}
 else:
@@ -115,7 +103,11 @@ with open(in_path,"r") as f:
         if len(docs_gold) == 0:
             continue
         # print(docs_gold)
-        docs_predicted = [item for item in js['predicted_evidence'] if '_sentence_' in item]
+        try:
+            docs_predicted = [item for item in js['predicted_evidence'] if '_sentence_' in item]
+        except:
+            docs_predicted = [item for item in js['predicted_sentences'] if '_sentence_' in item] 
+        docs_predicted = docs_predicted[:args.max_sent]
         #docs_predicted =  [t[0] + '_' + t[1].replace('s_', 'sentence_') for t in js['predicted_sentences'][:5]]
         #docs_predicted = js['predicted_sentences']
         #docs_predicted = [t[0] + '_' +t[1] for t in js['predicted_evidence'] if 'sentence_' in t[1]]

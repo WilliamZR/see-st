@@ -1,6 +1,3 @@
-import sys
-sys.path.append("/home/hunan/feverous/mycode/src")
-
 import argparse
 import json
 from tqdm import tqdm
@@ -13,7 +10,6 @@ from urllib.parse import unquote
 
 
 def average(list):
-    print(len(list))
     return float(sum(list) / len(list))
 
 
@@ -52,22 +48,12 @@ if __name__ == "__main__":
     parser.add_argument('--all', type=int, default=1)
     args = parser.parse_args()
 
-    #in_path = '/home/hunan/feverous/mycode/data/{}.combined.not_precomputed.p{}.s{}.t{}.cells.jsonl'.format(args.split, args.max_page, args.max_sent,args.max_tabs)
-    #in_path = '/home/hunan/feverous/mycode/data/dev.p5.t3.check.0428.sents.jsonl'
-    in_path = '/home/wuzr/feverous/data/{0}.roberta_sent.rc_table.not_precomputed.p5.s5.t{1}.jsonl'.format(args.split, args.max_tabs)
-    #in_path = '/home/hunan/feverous/mycode/data/dev.rc.p5.t5.jsonl'
+    in_path = 'data/{0}.rc.p5.t{1}.jsonl'.format(args.split, args.max_tabs)
     split = args.split
 
-    # q = 0
-    # q_all = 0
-    # score = 0
-    # score_all = 0
-    #in_path = '/home/hunan/feverous/mycode/data/{0}.tables.not_precomputed.p{1}.t{2}.jsonl'.format(split, args.max_page, args.max_tabs)
-    #in_path = args.input_path
     coverage = []
     coverage_all = []
-    # in_path = 'data/annotations/{0}.sentences.not_precomputed.p{1}.s{2}.jsonl'.format(split, args.max_page, args.max_sent)
-    annotation_processor = AnnotationProcessor('/home/hunan/feverous/mycode/data/{}.jsonl'.format(args.split))
+    annotation_processor = AnnotationProcessor('data/{}.jsonl'.format(args.split))
     if args.all == 0:
         annotation_by_id = {el.get_id(): el for el in annotation_processor if el.has_evidence() and el.get_evidence_type(flat=True) == EvidenceType.TABLE}
     else:
@@ -92,9 +78,9 @@ if __name__ == "__main__":
 
             #docs_predicted =  [clean_title(t[0]) + '_' + t[1].replace('t_', 'table_') for t in js['predicted_tables'][:3]]
             try:
-                docs_predicted = js['predicted_tables'][:args.max_tabs]
+                docs_predicted = js['predicted_tables'][:3]
             except:
-                docs_predicted = [evi for evi in js['predicted_evidence'] if '_table_' in evi][:args.max_tabs]
+                docs_predicted = [evi for evi in js['predicted_evidence'] if '_table_' in evi][:3]
             # print(docs_predicted)
 
             # print(docs_predicted)
@@ -108,9 +94,10 @@ if __name__ == "__main__":
             else:
                 coverage_ele = len(set(docs_predicted) & set(docs_gold)) / len(docs_gold)
                 coverage_all.append(coverage_ele)
-
-    print(average(coverage))
-    print(average(coverage_all))
+    print('{} claims including verdicts SUPPORTS and REFUTES'.format(len(coverage)))
+    print('Top 3 Table Recall: {}'.format(average(coverage)))
+    print('{} claims including verdicts SUPPORTS, REFUTES and NEI'.format(len(coverage_all)))
+    print('Top 3 Table Recall: {}'.format(average(coverage_all)))
 
     # PYTHONPATH=src python src/baseline/retriever/eval_tab_retriever.py --split dev --max_page 5 --max_tabs 3
     # Baseline 0.56

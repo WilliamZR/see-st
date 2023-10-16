@@ -94,17 +94,29 @@ def compute_table_retrieval(table_score_by_id, gold_evidence_by_id, args):
             continue
         recall = len(set(predicted_tables) & set(gold_evidence_by_id[id])) / len(set(gold_evidence_by_id[id]))
         recall_all.append(recall)
-    return average(recall_all), table_score_by_id
+    if len(recall_all) > 0:
+        recall_result = average(recall_all)
+    else:
+        recall_result = 'N/A'
+    return recall_result, table_score_by_id
 
 def get_gold_table_evidence(datatype, input_path):
     gold_table_by_id = {}
-    assert datatype in ['train', 'dev']
-    inpath = '{0}/{1}.jsonl'.format(input_path, datatype)
-    annotation_processor = AnnotationProcessor(inpath)
-    for anno in annotation_processor:
-        id = anno.id
-        evidence = anno.get_evidence(flat = True)
-        gold_table_by_id[id] = list(set(evi.split('_')[0] + '_table_' + evi.split('_')[-3] for evi in evidence if '_cell_' in evi))
+    if datatype in ['train', 'dev']:
+        inpath = '{0}/{1}.jsonl'.format(input_path, datatype)
+        annotation_processor = AnnotationProcessor(inpath)
+        for anno in annotation_processor:
+            id = anno.id
+            evidence = anno.get_evidence(flat = True)
+            gold_table_by_id[id] = list(set(evi.split('_')[0] + '_table_' + evi.split('_')[-3] for evi in evidence if '_cell_' in evi))
+    elif datatype == 'test':
+        inpath = '{0}/{1}.jsonl'.format(input_path, datatype)
+        annotation_processor = AnnotationProcessor(inpath)
+        for anno in annotation_processor:
+            id = anno.id
+            gold_table_by_id[id] = []
+    else:
+        raise NotImplementedError
     return gold_table_by_id
 
 
@@ -202,10 +214,6 @@ def main():
 
                 grad_dict_first = print_grad(model)
                 tb.add_scalars("model_grads_first", grad_dict_first, global_step)
-                '''
-                grad_dict_second = print_grad(model, "second")
-                tb.add_scalars("model_grads_second", grad_dict_second, global_step)
-                '''
                 optimizer.zero_grad()
             if ii % args.print_freq == 0:
                 print('Epoch:{0},step:{1}'.format(epoch, ii))
@@ -224,7 +232,9 @@ def main():
             'table_recall':recall,
             'select_criterion': args.select_criterion
             }
-        path = model.save(args.model_save_path, ckpt_meta, recall, only_max= (not args.save_all_ckpt))            
+        if recall > table_recall_flag:
+            table_recall_flag = recall
+            path = model.save(args.model_save_path, ckpt_meta, recall, only_max= (not args.save_all_ckpt))            
 
 if __name__ == '__main__':
     main()

@@ -42,3 +42,4 @@ checkpoints/
 __pycache__/
 data_analysis/
 row_col_fusion_graph/
+runs/
