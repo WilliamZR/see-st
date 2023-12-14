@@ -18,15 +18,14 @@ from utils.annotation_processor import AnnotationProcessor, EvidenceType
 from utils.wiki_page import WikiPage, get_wikipage_by_id,WikiTable
 from database.feverous_db import FeverousDB
 from graph_parser import get_parser
-from rc_data_generator import average_of_matrix
 from util import connect_pooling_matrix
 from baseline.drqa.tokenizers.spacy_tokenizer import SpacyTokenizer
 import jsonlines
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input_path', type = str, default = '/home/wuzr/feverous/data')
-    parser.add_argument('--input_file', type = str, default='dev.rc.analysis.005.jsonl')
+    parser.add_argument('--input_path', type = str, default = 'data')
+    parser.add_argument('--input_file', type = str)
     parser.add_argument('--split', type = str, default='dev')
     args = parser.parse_args()
     print(args)
@@ -45,7 +44,7 @@ if __name__ == '__main__':
 
     with jsonlines.open('{0}/{1}.jsonl'.format(args.input_path, args.split), 'r') as f: 
     ### Output keys :, 'id', 'claim', 'evidence', 'label', 'predicted_evidence'
-        with jsonlines.open('{0}/{1}.scorecheck.005.jsonl'.format(args.input_path, args.split), 'w') as writer:
+        with jsonlines.open('{0}/{1}.scorecheck.jsonl'.format(args.input_path, args.split), 'w') as writer:
             for i, line in enumerate(f):
                 if i == 0:
                     writer.write({'header':''})

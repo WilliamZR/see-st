@@ -54,7 +54,7 @@ class RowColSentFusionGraphGenerator(torch.utils.data.Dataset):
 
     def clean_raw_data(self):
         def keep_instance(instance):
-            if (1 not in instance['sent_labels'] and 1 not in instance['cell_labels']) and self.data_type == 'train':
+            if (1 not in instance['sent_labels'] or 1 not in instance['cell_labels']) and self.data_type == 'train':
                 return False
             if not instance['sentences']:
                 return False

@@ -215,7 +215,10 @@ if __name__ == '__main__':
                 loss_and_metric(cell_metric, cell_loss, cell_pred_logits, cell_labels, cell_pred_epoch, cell_gold_epoch, args.cell_threshold, args)
 
             global_step += 1
-            loss = args.sent_k * sent_loss + args.row_k * row_loss + args.col_k * col_loss + args.cell_k * cell_loss
+            if row_labels.size() != torch.Size([0]):
+                loss = args.sent_k * sent_loss + args.row_k * row_loss + args.col_k * col_loss + args.cell_k * cell_loss
+            else:
+                loss = args.sent_k * sent_loss      
 
             loss_epoch.append(loss.item())
             loss = loss / args.gradient_accumulation_steps

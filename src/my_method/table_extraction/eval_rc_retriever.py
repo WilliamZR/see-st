@@ -18,7 +18,7 @@ from rc_model import RC_MLP_Retriever
 if __name__ == '__main__':
     args = get_parser().parse_args()
     print(args)
-    for eval_split in ['train', 'dev', 'test']:
+    for eval_split in ['dev']:
         tokenizer = AutoTokenizer.from_pretrained(args.tapas_path)
         gold_evidence_by_id = get_gold_table_evidence(eval_split, args.input_path)
         model = RC_MLP_Retriever(args)

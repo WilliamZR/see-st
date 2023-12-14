@@ -74,10 +74,10 @@ class FusionGraphModel(BasicModule):
         sent_logits = torch.softmax(sent_logits.view(-1, 2), dim = -1)
 
         if table_input_ids.size() == torch.Size([0]):
-            row_logits = torch.tensor(-1).to(self.args.device)
-            col_logits = torch.tensor(-1).to(self.args.device)
-            cell_logits = torch.tensor(-1).to(self.args.device)
-
+            row_logits = torch.tensor(1).to(self.args.device)
+            col_logits = torch.tensor(1).to(self.args.device)
+            cell_logits = torch.tensor(1).to(self.args.device)
+ 
         else:
             row_h = graph_embs[batch_num_sentences:-batch_num_cols]
             col_h = graph_embs[-batch_num_cols:]

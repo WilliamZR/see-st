@@ -1,6 +1,5 @@
 import sys
 
-sys.path.append("/home/hunan/feverous/mycode/src")
 import argparse
 import json
 from tqdm import tqdm
@@ -68,7 +67,7 @@ def evidence_coverage(args):
     log = 0
     coverage = []
     coverage_all = []
-    annotation_processor = AnnotationProcessor('/home/hunan/feverous/mycode/data/{}.jsonl'.format(args.split))
+    annotation_processor = AnnotationProcessor('data/{}.jsonl'.format(args.split))
     if args.all == 0:
         annotation_by_id = {i: el for i, el in enumerate(annotation_processor) if
                             el.has_evidence() and el.get_evidence_type(flat=True) == EvidenceType.SENTENCE}
@@ -78,13 +77,13 @@ def evidence_coverage(args):
     gold_cell_num = []
     pred_cell_num = []
     #with open('/home/wuzr/feverous/data/{}.combined.not_precomputed.p5.s5.t3.cells.verdict.jsonl'.format(args.split), 'r') as f:
-    input_path = '/home/wuzr/feverous/data/dev.scorecheck.jsonl'
+    input_path = '/home/wuzr/see-st/data/dev.scorecheck.jsonl'
     with open(input_path, 'r') as f:
         for idx, line in enumerate(f):
             if idx == 0:
                 continue
             js = json.loads(line)
-            id = idx  # js['id']
+            id = idx - 1 # js['id']
             if id not in annotation_by_id:
                 continue
             anno = annotation_by_id[id]
@@ -156,7 +155,7 @@ if __name__ == "__main__":
     parser.add_argument('--max_tabs', type=int, default=3)
     parser.add_argument('--split', type=str, default='dev')
     parser.add_argument('--all', type=int, default=1)
-    parser.add_argument('--wiki_path',default='/home/hunan/feverous/mycode/data/feverous_wikiv1.db',type=str)
+    parser.add_argument('--wiki_path',default='data/feverous_wikiv1.db',type=str)
     args = parser.parse_args()
     init_db(args.wiki_path)
     evidence_coverage(args)
